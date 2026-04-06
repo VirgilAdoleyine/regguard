@@ -1,0 +1,154 @@
+{
+  "name": "regguard",
+  "displayName": "RegGuard",
+  "description": "AI compliance co-pilot — flags regulatory issues in your code and proposes fixes using Perplexity, Grok, and Claude via OpenRouter.",
+  "version": "0.1.0",
+  "publisher": "regguard",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "compliance",
+    "GDPR",
+    "regulations",
+    "AI",
+    "security",
+    "langchain"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "icon": "assets/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/regguard"
+  },
+  "license": "MIT",
+  "contributes": {
+    "commands": [
+      {
+        "command": "regguard.scan",
+        "title": "RegGuard: Scan current file"
+      },
+      {
+        "command": "regguard.scanWorkspace",
+        "title": "RegGuard: Scan workspace"
+      },
+      {
+        "command": "regguard.clearFlags",
+        "title": "RegGuard: Clear all flags"
+      },
+      {
+        "command": "regguard.configure",
+        "title": "RegGuard: Open configuration"
+      },
+      {
+        "command": "regguard.refreshRegs",
+        "title": "RegGuard: Refresh regulations cache"
+      }
+    ],
+    "configuration": {
+      "title": "RegGuard",
+      "properties": {
+        "regguard.openRouterKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your OpenRouter API key (get one free at openrouter.ai)"
+        },
+        "regguard.productType": {
+          "type": "string",
+          "default": "",
+          "description": "Describe your product e.g. 'fintech mobile app'"
+        },
+        "regguard.releaseRegions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Regions you are releasing in e.g. [\"EU\",\"US\"]"
+        },
+        "regguard.clientRegions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Regions your users are located in"
+        },
+        "regguard.externalTools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "External services e.g. [\"Stripe\",\"AWS S3\"]"
+        },
+        "regguard.internalTools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Frameworks e.g. [\"React\",\"PostgreSQL\"]"
+        },
+        "regguard.scanOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auto-scan on save"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "regguard-sidebar",
+          "title": "RegGuard",
+          "icon": "$(shield)"
+        }
+      ]
+    },
+    "views": {
+      "regguard-sidebar": [
+        {
+          "type": "webview",
+          "id": "regguard.sidebar",
+          "name": "Compliance Findings"
+        }
+      ]
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "regguard.scan",
+          "group": "regguard@1"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish:ovsx": "ovsx publish *.vsix -p $OVSX_TOKEN",
+    "publish:vsce": "vsce publish"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.58",
+    "@langchain/openai": "0.3.17",
+    "langchain": "0.3.37"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.24.0",
+    "ovsx": "^0.9.0",
+    "typescript": "^5.3.0"
+  }
+}

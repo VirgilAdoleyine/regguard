@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RegGuard — Open VSX Launch Guide</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #222636;
+  --border: #2e3348;
+  --text: #e2e4ef;
+  --muted: #7b82a3;
+  --purple: #8b5cf6;
+  --purple-dim: #3b2d6b;
+  --teal: #14b8a6;
+  --teal-dim: #0d3330;
+  --amber: #f59e0b;
+  --amber-dim: #3b2800;
+  --red: #ef4444;
+  --green: #22c55e;
+  --green-dim: #0d2d1a;
+  --code-bg: #11131c;
+  --radius: 8px;
+  font-size: 15px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.7;
+  padding: 0 0 80px;
+}
+
+/* ── Header ── */
+header {
+  background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 40px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 10px;
+}
+h1 { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+.subtitle { color: var(--muted); font-size: 15px; }
+.time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid var(--purple);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+/* ── Layout ── */
+.container { max-width: 900px; margin: 0 auto; padding: 0 40px; }
+
+/* ── Timeline ── */
+.timeline { position: relative; padding: 40px 0; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.step {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 40px;
+  position: relative;
+}
+.step-number {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--purple);
+  z-index: 1;
+  position: relative;
+}
+.step-number.done { background: var(--purple-dim); }
+.step-body {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  min-width: 0;
+}
+.step-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.step-title { font-size: 17px; font-weight: 700; }
+.tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.tag-time { background: var(--amber-dim); color: var(--amber); }
+.tag-cli  { background: var(--teal-dim);  color: var(--teal);  }
+.tag-web  { background: var(--purple-dim); color: var(--purple); }
+.tag-file { background: var(--green-dim); color: var(--green); }
+
+.step-desc { color: var(--muted); font-size: 14px; margin-bottom: 14px; line-height: 1.6; }
+
+/* ── Code blocks ── */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.code-label {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+pre {
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #c9d1e3;
+  white-space: pre;
+}
+.hl-cmd   { color: #7dd3fc; }
+.hl-flag  { color: #a78bfa; }
+.hl-val   { color: #6ee7b7; }
+.hl-cmt   { color: #4b5280; font-style: italic; }
+.hl-key   { color: #f59e0b; }
+.hl-str   { color: #86efac; }
+
+/* ── Callouts ── */
+.callout {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin: 12px 0;
+  border-left: 3px solid;
+}
+.callout-tip   { background: var(--teal-dim);  border-color: var(--teal);  color: #99f6e4; }
+.callout-warn  { background: var(--amber-dim); border-color: var(--amber); color: #fcd34d; }
+.callout-info  { background: var(--purple-dim); border-color: var(--purple); color: #c4b5fd; }
+
+/* ── Checklist ── */
+.checklist { list-style: none; padding: 0; margin: 10px 0; }
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.checklist li:last-child { border: none; }
+.check-icon { color: var(--green); flex-shrink: 0; margin-top: 2px; }
+
+/* ── File tree ── */
+.tree {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  color: #c9d1e3;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  line-height: 2;
+  margin: 10px 0;
+}
+.tree .dir  { color: #7dd3fc; }
+.tree .new  { color: #86efac; }
+.tree .req  { color: #f59e0b; }
+
+/* ── Final banner ── */
+.done-banner {
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-top: 40px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.done-icon { font-size: 28px; flex-shrink: 0; }
+.done-title { font-size: 18px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.done-text  { font-size: 14px; color: #86efac; line-height: 1.6; }
+
+/* ── Divider ── */
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 32px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+a { color: var(--purple); text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 600; color: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">RegGuard · Publish Guide</div>
+  <h1>Launch on Open VSX</h1>
+  <p class="subtitle">Everything you need to go from source code to installable extension — available to every VS Code fork and Gitpod user on the planet.</p>
+  <div class="time-badge">⏱ ~2 hours end-to-end</div>
+</header>
+
+<div class="container">
+
+  <p class="section-label">Phase 1 — Prerequisites (15 min)</p>
+
+  <div class="timeline">
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Verify your toolchain</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">5 min</span>
+        </div>
+        <p class="step-desc">You need Node 18+, npm, and Git. Run each check — if any command fails, install the missing tool before continuing.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">node</span> <span class="hl-flag">--version</span>        <span class="hl-cmt"># must be ≥ 18.0.0</span>
+<span class="hl-cmd">npm</span>  <span class="hl-flag">--version</span>        <span class="hl-cmt"># must be ≥ 9</span>
+<span class="hl-cmd">git</span>  <span class="hl-flag">--version</span>        <span class="hl-cmt"># any version</span></pre>
+        </div>
+        <div class="callout callout-tip">
+          💡 If Node is missing, install it from <strong>nodejs.org</strong> — use the LTS version.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Install global publish tools</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">2 min</span>
+        </div>
+        <p class="step-desc"><strong>vsce</strong> packages your extension into a <code>.vsix</code> file. <strong>ovsx</strong> uploads it to Open VSX. Both are already in devDependencies but install them globally so you can run them from anywhere.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">npm</span> install <span class="hl-flag">-g</span> <span class="hl-val">@vscode/vsce ovsx</span></pre>
+        </div>
+        <div class="callout callout-warn">
+          ⚠ On macOS/Linux you may need <code>sudo</code> before this command, or use <code>nvm</code> to avoid permission issues.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Unzip and install dependencies</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">5 min</span>
+        </div>
+        <p class="step-desc">Extract the RegGuard zip, enter the directory, and install npm packages — this pulls in LangChain and all dev tools.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">unzip</span> regguard.zip
+<span class="hl-cmd">cd</span> regguard
+<span class="hl-cmd">npm</span> install          <span class="hl-cmt"># installs langchain, @langchain/openai, vsce, ovsx</span></pre>
+        </div>
+        <div class="tree">
+<span class="dir">regguard/</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">agents/</span>       perplexityAgent.ts · grokAgent.ts · claudeAgent.ts
+│   ├── <span class="dir">providers/</span>    diagnosticsProvider.ts · codeActionProvider.ts · sidebarProvider.ts
+│   ├── extension.ts · scanner.ts · config.ts · types.ts · llm.ts
+├── <span class="req">assets/icon.png</span>   ← you must add this (see Step 6)
+├── package.json · tsconfig.json · README.md
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /timeline phase 1 -->
+
+  <p class="section-label">Phase 2 — Open VSX account (20 min)</p>
+
+  <div class="timeline">
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Create an Open VSX account</span>
+          <span class="tag tag-web">Browser</span>
+          <span class="tag tag-time">5 min</span>
+        </div>
+        <p class="step-desc">Open VSX uses GitHub OAuth — no separate sign-up form.</p>
+        <ul class="checklist">
+          <li><span class="check-icon">→</span> Go to <a href="https://open-vsx.org" target="_blank">open-vsx.org</a></li>
+          <li><span class="check-icon">→</span> Click <strong>Sign in with GitHub</strong> (top right)</li>
+          <li><span class="check-icon">→</span> Authorize the Open VSX OAuth app</li>
+          <li><span class="check-icon">→</span> You'll be redirected back — you're in</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Create a publisher namespace and get your token</span>
+          <span class="tag tag-web">Browser</span>
+          <span class="tag tag-time">5 min</span>
+        </div>
+        <p class="step-desc">Every extension lives under a publisher namespace. Your publisher name goes in <code>package.json</code> and becomes part of the extension ID.</p>
+        <ul class="checklist">
+          <li><span class="check-icon">→</span> Click your avatar → <strong>User Settings</strong></li>
+          <li><span class="check-icon">→</span> Click <strong>Extensions</strong> → <strong>Create namespace</strong></li>
+          <li><span class="check-icon">→</span> Enter your publisher name (e.g. <code>regguard</code> or your GitHub username). This must match <code>"publisher"</code> in <code>package.json</code>.</li>
+          <li><span class="check-icon">→</span> Click your avatar → <strong>User Settings</strong> → <strong>Access Tokens</strong></li>
+          <li><span class="check-icon">→</span> Click <strong>Generate new token</strong> — give it a name like <code>regguard-publish</code></li>
+          <li><span class="check-icon">→</span> <strong>Copy the token immediately</strong> — you won't see it again</li>
+        </ul>
+        <div class="callout callout-warn">
+          ⚠ Store the token somewhere safe (e.g. your password manager). You'll use it in Step 10.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Phase 3 — Prepare the extension (30 min)</p>
+
+  <div class="timeline">
+
+    <!-- Step 6 -->
+    <div class="step">
+      <div class="step-number">6</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Add an icon (required)</span>
+          <span class="tag tag-file">File</span>
+          <span class="tag tag-time">5 min</span>
+        </div>
+        <p class="step-desc">Open VSX requires a 128×128 PNG icon. Without it, packaging fails.</p>
+        <ul class="checklist">
+          <li><span class="check-icon">→</span> Create a folder called <code>assets/</code> inside the regguard directory</li>
+          <li><span class="check-icon">→</span> Add a 128×128 PNG named <code>icon.png</code> to that folder</li>
+          <li><span class="check-icon">→</span> Quick option: use any shield icon from <a href="https://icon.kitchen" target="_blank">icon.kitchen</a> or <a href="https://www.flaticon.com" target="_blank">flaticon.com</a> — resize to 128×128 and save as PNG</li>
+        </ul>
+        <div class="code-block">
+          <div class="code-label">bash — confirm it exists</div>
+          <pre><span class="hl-cmd">ls</span> assets/icon.png   <span class="hl-cmt"># should print: assets/icon.png</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="step">
+      <div class="step-number">7</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Update publisher in package.json</span>
+          <span class="tag tag-file">File</span>
+          <span class="tag tag-time">2 min</span>
+        </div>
+        <p class="step-desc">Open <code>package.json</code> and set the <code>publisher</code> field to exactly the namespace you created in Step 5. Also update the <code>repository.url</code> to your GitHub repo.</p>
+        <div class="code-block">
+          <div class="code-label">package.json — lines to change</div>
+          <pre><span class="hl-key">"publisher"</span>: <span class="hl-str">"YOUR_NAMESPACE_FROM_STEP_5"</span>,
+<span class="hl-key">"repository"</span>: {
+  <span class="hl-key">"type"</span>: <span class="hl-str">"git"</span>,
+  <span class="hl-key">"url"</span>:  <span class="hl-str">"https://github.com/YOUR_GITHUB_USERNAME/regguard"</span>
+},</pre>
+        </div>
+        <div class="callout callout-info">
+          ℹ Open VSX requires a <code>repository</code> field and a valid <code>license</code> field — both are already in the template. Just update the URL.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 8 -->
+    <div class="step">
+      <div class="step-number">8</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Push to GitHub (required for Open VSX)</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">5 min</span>
+        </div>
+        <p class="step-desc">Open VSX requires extensions to have a public source repository. Create a GitHub repo and push.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmt"># Create a new repo on github.com first, then:</span>
+<span class="hl-cmd">git</span> init
+<span class="hl-cmd">git</span> add .
+<span class="hl-cmd">git</span> commit <span class="hl-flag">-m</span> <span class="hl-str">"feat: initial RegGuard release"</span>
+<span class="hl-cmd">git</span> remote add origin https://github.com/YOUR_USERNAME/regguard.git
+<span class="hl-cmd">git</span> branch <span class="hl-flag">-M</span> main
+<span class="hl-cmd">git</span> push <span class="hl-flag">-u</span> origin main</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 9 -->
+    <div class="step">
+      <div class="step-number">9</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Compile and package the .vsix</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">3 min</span>
+        </div>
+        <p class="step-desc">TypeScript → JavaScript, then bundle everything into a single <code>.vsix</code> file that Open VSX will accept.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">npm</span> run compile    <span class="hl-cmt"># compiles TypeScript to out/</span>
+<span class="hl-cmd">vsce</span> package        <span class="hl-cmt"># creates regguard-0.1.0.vsix in the current folder</span></pre>
+        </div>
+        <div class="callout callout-tip">
+          💡 If <code>vsce package</code> warns about missing fields, it will tell you exactly which ones. Fix them in <code>package.json</code> and re-run.
+        </div>
+        <p class="step-desc" style="margin-top:10px">Verify the package is healthy:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">vsce</span> ls             <span class="hl-cmt"># lists all files that will be included — check for bloat</span>
+<span class="hl-cmd">ls</span> <span class="hl-flag">-lh</span> *.vsix       <span class="hl-cmt"># should be a few MB max</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Phase 4 — Publish (15 min)</p>
+
+  <div class="timeline">
+
+    <!-- Step 10 -->
+    <div class="step">
+      <div class="step-number">10</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Publish to Open VSX</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">3 min</span>
+        </div>
+        <p class="step-desc">Use the <code>ovsx</code> CLI to upload the <code>.vsix</code>. Pass your token via the <code>-p</code> flag (or set the env variable to avoid it appearing in shell history).</p>
+
+        <p class="step-desc" style="margin-top:8px"><strong>Option A — env variable (recommended):</strong></p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">export</span> OVSX_TOKEN=<span class="hl-val">your_token_from_step_5</span>
+<span class="hl-cmd">ovsx</span> publish regguard-0.1.0.vsix <span class="hl-flag">-p</span> <span class="hl-val">$OVSX_TOKEN</span></pre>
+        </div>
+
+        <p class="step-desc" style="margin-top:8px"><strong>Option B — npm script (already wired up):</strong></p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><span class="hl-cmd">export</span> OVSX_TOKEN=<span class="hl-val">your_token_from_step_5</span>
+<span class="hl-cmd">npm</span> run publish:ovsx   <span class="hl-cmt"># runs: ovsx publish *.vsix -p $OVSX_TOKEN</span></pre>
+        </div>
+
+        <p class="step-desc" style="margin-top:10px">Expected output:</p>
+        <div class="code-block">
+          <div class="code-label">success</div>
+          <pre><span class="hl-val">Successfully published regguard@0.1.0 to Open VSX!</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 11 -->
+    <div class="step">
+      <div class="step-number">11</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Verify it's live</span>
+          <span class="tag tag-web">Browser</span>
+          <span class="tag tag-time">2 min</span>
+        </div>
+        <p class="step-desc">Your extension should appear within a few minutes.</p>
+        <ul class="checklist">
+          <li><span class="check-icon">→</span> Go to <a href="https://open-vsx.org" target="_blank">open-vsx.org</a> and search <strong>RegGuard</strong></li>
+          <li><span class="check-icon">→</span> Or go directly to <code>open-vsx.org/extension/YOUR_PUBLISHER/regguard</code></li>
+          <li><span class="check-icon">→</span> In VS Code (or VS Codium), open Extensions, search <strong>RegGuard</strong>, click Install</li>
+        </ul>
+        <div class="callout callout-tip">
+          💡 Open VSX also serves the <strong>VS Code Marketplace API</strong> fallback for VS Codium, Gitpod, GitHub Codespaces, and Eclipse Theia — one publish, every editor.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Phase 5 — Updates (ongoing)</p>
+
+  <div class="timeline">
+
+    <!-- Step 12 -->
+    <div class="step">
+      <div class="step-number">12</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Publishing future versions</span>
+          <span class="tag tag-cli">Terminal</span>
+          <span class="tag tag-time">5 min per update</span>
+        </div>
+        <p class="step-desc">Bump the version in <code>package.json</code>, then recompile and republish. Semantic versioning: <code>patch</code> = bug fix, <code>minor</code> = new feature, <code>major</code> = breaking change.</p>
+        <div class="code-block">
+          <div class="code-label">bash — patch release workflow</div>
+          <pre><span class="hl-cmt"># 1. Bump version (edits package.json and creates a git tag)</span>
+<span class="hl-cmd">npm</span> version patch   <span class="hl-cmt"># 0.1.0 → 0.1.1</span>
+
+<span class="hl-cmt"># 2. Compile + package</span>
+<span class="hl-cmd">npm</span> run compile
+<span class="hl-cmd">vsce</span> package
+
+<span class="hl-cmt"># 3. Publish</span>
+<span class="hl-cmd">npm</span> run publish:ovsx
+
+<span class="hl-cmt"># 4. Push git tag</span>
+<span class="hl-cmd">git</span> push <span class="hl-flag">--follow-tags</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 13 (optional CI) -->
+    <div class="step">
+      <div class="step-number">13</div>
+      <div class="step-body">
+        <div class="step-meta">
+          <span class="step-title">Automate with GitHub Actions (optional)</span>
+          <span class="tag tag-file">File</span>
+          <span class="tag tag-time">10 min</span>
+        </div>
+        <p class="step-desc">Add this workflow file — it publishes automatically whenever you push a version tag.</p>
+        <div class="code-block">
+          <div class="code-label">.github/workflows/publish.yml</div>
+          <pre><span class="hl-key">name:</span> <span class="hl-str">Publish to Open VSX</span>
+
+<span class="hl-key">on:</span>
+  <span class="hl-key">push:</span>
+    <span class="hl-key">tags:</span>
+      <span class="hl-flag">- 'v*'</span>   <span class="hl-cmt"># triggers on v0.1.0, v1.0.0, etc.</span>
+
+<span class="hl-key">jobs:</span>
+  <span class="hl-key">publish:</span>
+    <span class="hl-key">runs-on:</span> <span class="hl-str">ubuntu-latest</span>
+    <span class="hl-key">steps:</span>
+      <span class="hl-flag">- uses:</span> <span class="hl-str">actions/checkout@v4</span>
+      <span class="hl-flag">- uses:</span> <span class="hl-str">actions/setup-node@v4</span>
+        <span class="hl-key">with:</span>
+          <span class="hl-key">node-version:</span> <span class="hl-str">'20'</span>
+      <span class="hl-flag">-</span> <span class="hl-key">run:</span> <span class="hl-str">npm ci</span>
+      <span class="hl-flag">-</span> <span class="hl-key">run:</span> <span class="hl-str">npm run compile</span>
+      <span class="hl-flag">-</span> <span class="hl-key">run:</span> <span class="hl-str">npx vsce package</span>
+      <span class="hl-flag">-</span> <span class="hl-key">run:</span> <span class="hl-str">npx ovsx publish *.vsix -p $OVSX_TOKEN</span>
+        <span class="hl-key">env:</span>
+          <span class="hl-key">OVSX_TOKEN:</span> <span class="hl-str">${{ secrets.OVSX_TOKEN }}</span></pre>
+        </div>
+        <div class="callout callout-tip">
+          💡 Add <strong>OVSX_TOKEN</strong> in your GitHub repo → Settings → Secrets → Actions → New repository secret.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Done banner -->
+  <div class="done-banner">
+    <div class="done-icon">🎉</div>
+    <div>
+      <div class="done-title">RegGuard is live!</div>
+      <div class="done-text">
+        Any developer using VS Code, VS Codium, Gitpod, or GitHub Codespaces can now install RegGuard directly from the Extensions panel — for free, no account required on their end.<br><br>
+        Share your extension page: <strong>open-vsx.org/extension/YOUR_PUBLISHER/regguard</strong>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label" style="margin-top:40px">Troubleshooting</p>
+
+  <div class="timeline" style="padding-top:24px">
+    <div class="step">
+      <div class="step-number" style="font-size:13px;border-color:var(--amber);color:var(--amber)">?</div>
+      <div class="step-body">
+        <ul class="checklist">
+          <li><span class="check-icon" style="color:var(--amber)">!</span> <strong>"Publisher not found"</strong> — the namespace in Step 5 must exactly match <code>"publisher"</code> in package.json (case-sensitive)</li>
+          <li><span class="check-icon" style="color:var(--amber)">!</span> <strong>"Missing icon"</strong> — <code>assets/icon.png</code> must exist and be a valid 128×128 PNG before running <code>vsce package</code></li>
+          <li><span class="check-icon" style="color:var(--amber)">!</span> <strong>"Repository field required"</strong> — add a <code>repository</code> object to <code>package.json</code> pointing to your public GitHub repo</li>
+          <li><span class="check-icon" style="color:var(--amber)">!</span> <strong>Token rejected</strong> — tokens expire; generate a new one in Open VSX user settings</li>
+          <li><span class="check-icon" style="color:var(--amber)">!</span> <strong>TypeScript compile errors</strong> — run <code>npm install</code> first to ensure LangChain types are present, then <code>npm run compile</code></li>
+          <li><span class="check-icon" style="color:var(--amber)">!</span> <strong>Extension not appearing in search</strong> — Open VSX indexes within ~5 minutes; search by exact name <code>RegGuard</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</body>
+</html>
