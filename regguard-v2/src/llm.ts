@@ -10,10 +10,11 @@ const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 export type AgentModel = 'perplexity' | 'grok' | 'claude';
 
 const MODEL_IDS: Record<AgentModel, string> = {
-  perplexity: 'perplexity/llama-3.1-sonar-large-128k-online',
-  grok:       'x-ai/grok-2-1212',
-  claude:     'anthropic/claude-3.5-sonnet',
+  perplexity: 'perplexity/sonar-deep-research',
+  grok:       'x-ai/grok-4.20',
+  claude:     'anthropic/claude-sonnet-4.6',
 };
+
 
 /**
  * Returns a ChatOpenAI instance configured to call the given agent model
