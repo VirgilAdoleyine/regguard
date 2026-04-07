@@ -2,7 +2,7 @@
   "name": "regguard",
   "displayName": "RegGuard",
   "description": "AI compliance co-pilot — flags regulatory issues in your code and proposes fixes using Perplexity, Grok, and Claude via OpenRouter.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "regguard",
   "engines": {
     "vscode": "^1.85.0"
@@ -26,7 +26,7 @@
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/regguard"
+    "url": "https://github.com/VirgilAdoleyine/regguard"
   },
   "license": "MIT",
   "contributes": {
