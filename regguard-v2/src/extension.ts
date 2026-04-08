@@ -8,6 +8,47 @@ import { CodeFinding } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
 
+  // ── Rating Prompt (after 3 hours) ─────────────────────────────────────────────
+  const RATING_DELAY_MS = 3 * 60 * 60 * 1000; // 3 hours
+  const installTime = context.globalState.get<number>('installTime');
+  const hasPromptedRating = context.globalState.get<boolean>('hasPromptedRating');
+
+  if (!installTime) {
+    context.globalState.update('installTime', Date.now());
+  } else if (!hasPromptedRating && Date.now() - installTime >= RATING_DELAY_MS) {
+    context.globalState.update('hasPromptedRating', true);
+    setTimeout(async () => {
+      const choice = await vscode.window.showInformationMessage(
+        'How is RegGuard working for you?',
+        { modal: true },
+        '😊 Good',
+        '😐 Meh',
+        '😕 Ok',
+        '👎 Bad'
+      );
+      if (choice) {
+        const ratingMap: Record<string, string> = {
+          '😊 Good': 'good',
+          '😐 Meh': 'meh',
+          '😕 Ok': 'ok',
+          '👎 Bad': 'bad'
+        };
+        const rating = ratingMap[choice];
+        vscode.window.showInformationMessage(
+          `Thanks for your feedback: ${rating}! ${rating === 'bad' ? 'Please email us at virgiladoleyine@gmail.com to help us improve.' : '⭐ Please star us on GitHub!'}`,
+          'Open GitHub',
+          'Email Us'
+        ).then(selection => {
+          if (selection === 'Open GitHub') {
+            vscode.env.openExternal(vscode.Uri.parse('https://github.com/VirgilAdoleyine/regguard'));
+          } else if (selection === 'Email Us') {
+            vscode.env.openExternal(vscode.Uri.parse('mailto:virgiladoleyine@gmail.com'));
+          }
+        });
+      }
+    }, 5000);
+  }
+
   // ── Providers ────────────────────────────────────────────────────────────────
   const diagnostics = new DiagnosticsProvider();
   const sidebar = new SidebarProvider();

@@ -127,6 +127,30 @@ Visit [vibeflow-cloud.vercel.app](https://vibeflow-cloud.vercel.app) for:
 
 ---
 
+## Contributing & Feedback
+
+We welcome contributions and feedback! Here's how you can help improve RegGuard:
+
+### Bug Reports & Feature Requests
+
+Found a bug or have a feature idea? Use our GitHub issue templates:
+
+- **Bug Report:** [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)
+- **Feature Request:** [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md)
+
+Simply go to [GitHub Issues](https://github.com/VirgilAdoleyine/regguard/issues) and click "New Issue" to use these templates.
+
+### Contact
+
+- **Email:** virgiladoleyine@gmail.com
+- **GitHub:** [github.com/VirgilAdoleyine/regguard](https://github.com/VirgilAdoleyine/regguard)
+
+### Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
+
+---
+
 ## Support RegGuard
 
 This extension is supported by RegGuard — a compliance and regulatory tool for developers to ship faster.

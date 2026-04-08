@@ -5456,10 +5456,10 @@ var init_serializable = __esm({
 // node_modules/@langchain/core/dist/utils/env.js
 async function getRuntimeEnvironment() {
   if (runtimeEnvironment === void 0) {
-    const env = getEnv();
+    const env2 = getEnv();
     runtimeEnvironment = {
       library: "langchain-js",
-      runtime: env
+      runtime: env2
     };
   }
   return runtimeEnvironment;
@@ -5486,21 +5486,21 @@ var init_env = __esm({
     isDeno = () => typeof Deno !== "undefined";
     isNode = () => typeof process !== "undefined" && typeof process.versions !== "undefined" && typeof process.versions.node !== "undefined" && !isDeno();
     getEnv = () => {
-      let env;
+      let env2;
       if (isBrowser()) {
-        env = "browser";
+        env2 = "browser";
       } else if (isNode()) {
-        env = "node";
+        env2 = "node";
       } else if (isWebWorker()) {
-        env = "webworker";
+        env2 = "webworker";
       } else if (isJsDom()) {
-        env = "jsdom";
+        env2 = "jsdom";
       } else if (isDeno()) {
-        env = "deno";
+        env2 = "deno";
       } else {
-        env = "other";
+        env2 = "other";
       }
-      return env;
+      return env2;
     };
   }
 });
@@ -8077,11 +8077,11 @@ var init_dist = __esm({
 // node_modules/langsmith/dist/utils/env.js
 function getRuntimeEnvironment2() {
   if (runtimeEnvironment2 === void 0) {
-    const env = getEnv2();
+    const env2 = getEnv2();
     const releaseEnv = getShas();
     runtimeEnvironment2 = {
       library: "langsmith",
-      runtime: env,
+      runtime: env2,
       sdk: "langsmith-js",
       sdk_version: __version__,
       ...releaseEnv
@@ -8172,10 +8172,10 @@ function getShas() {
     "BUILDKITE_COMMIT"
   ];
   const shas = {};
-  for (const env of common_release_envs) {
-    const envVar = getEnvironmentVariable2(env);
+  for (const env2 of common_release_envs) {
+    const envVar = getEnvironmentVariable2(env2);
     if (envVar !== void 0) {
-      shas[env] = envVar;
+      shas[env2] = envVar;
     }
   }
   cachedCommitSHAs = shas;
@@ -36900,12 +36900,12 @@ var castToError = (err) => {
   }
   return new Error(err);
 };
-var readEnv = (env) => {
+var readEnv = (env2) => {
   if (typeof process !== "undefined") {
-    return process.env?.[env]?.trim() ?? void 0;
+    return process.env?.[env2]?.trim() ?? void 0;
   }
   if (typeof Deno !== "undefined") {
-    return Deno.env?.get?.(env)?.trim();
+    return Deno.env?.get?.(env2)?.trim();
   }
   return void 0;
 };
@@ -46267,6 +46267,44 @@ async function scanDocument(document, config2, diagnosticsProvider, sidebarProvi
 
 // src/extension.ts
 function activate(context) {
+  const RATING_DELAY_MS = 3 * 60 * 60 * 1e3;
+  const installTime = context.globalState.get("installTime");
+  const hasPromptedRating = context.globalState.get("hasPromptedRating");
+  if (!installTime) {
+    context.globalState.update("installTime", Date.now());
+  } else if (!hasPromptedRating && Date.now() - installTime >= RATING_DELAY_MS) {
+    context.globalState.update("hasPromptedRating", true);
+    setTimeout(async () => {
+      const choice = await vscode6.window.showInformationMessage(
+        "How is RegGuard working for you?",
+        { modal: true },
+        "\u{1F60A} Good",
+        "\u{1F610} Meh",
+        "\u{1F615} Ok",
+        "\u{1F44E} Bad"
+      );
+      if (choice) {
+        const ratingMap = {
+          "\u{1F60A} Good": "good",
+          "\u{1F610} Meh": "meh",
+          "\u{1F615} Ok": "ok",
+          "\u{1F44E} Bad": "bad"
+        };
+        const rating = ratingMap[choice];
+        vscode6.window.showInformationMessage(
+          `Thanks for your feedback: ${rating}! ${rating === "bad" ? "Please email us at virgiladoleyine@gmail.com to help us improve." : "\u2B50 Please star us on GitHub!"}`,
+          "Open GitHub",
+          "Email Us"
+        ).then((selection) => {
+          if (selection === "Open GitHub") {
+            vscode6.env.openExternal(vscode6.Uri.parse("https://github.com/VirgilAdoleyine/regguard"));
+          } else if (selection === "Email Us") {
+            vscode6.env.openExternal(vscode6.Uri.parse("mailto:virgiladoleyine@gmail.com"));
+          }
+        });
+      }
+    }, 5e3);
+  }
   const diagnostics = new DiagnosticsProvider();
   const sidebar = new SidebarProvider();
   context.subscriptions.push(
