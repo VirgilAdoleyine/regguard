@@ -1,91 +1,89 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/providers/diagnosticsProvider.ts
+var diagnosticsProvider_exports = {};
+__export(diagnosticsProvider_exports, {
+  DiagnosticsProvider: () => DiagnosticsProvider
 });
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DiagnosticsProvider = void 0;
-const vscode = __importStar(require("vscode"));
-class DiagnosticsProvider {
-    constructor() {
-        this.findingsMap = new Map();
-        this.collection = vscode.languages.createDiagnosticCollection('regguard');
-    }
-    setFindings(document, findings) {
-        const key = document.uri.toString();
-        this.findingsMap.set(key, findings);
-        const diagnostics = findings.map(f => {
-            const startLine = Math.min(f.line, document.lineCount - 1);
-            const endLine = Math.min(f.endLine, document.lineCount - 1);
-            const startLineText = document.lineAt(startLine).text;
-            const endLineText = document.lineAt(endLine).text;
-            const startChar = Math.min(f.startChar ?? 0, startLineText.length);
-            const endChar = Math.min(f.endChar ?? endLineText.length, endLineText.length);
-            const range = new vscode.Range(startLine, startChar, endLine, endChar);
-            const msg = `[RegGuard] ${f.message}` +
-                (f.regulation.trending ? ` ⚠ Trending: ${f.regulation.name}` : ` — ${f.regulation.name}`);
-            const d = new vscode.Diagnostic(range, msg, this.mapSeverity(f.severity));
-            d.source = 'RegGuard';
-            d.code = { value: f.regulation.id, target: vscode.Uri.parse(f.regulation.source || 'https://openrouter.ai') };
-            // Attach finding for code action provider — stored on the object, not serialised
-            d.__regguardFinding = f;
-            return d;
-        });
-        this.collection.set(document.uri, diagnostics);
-    }
-    getFindings(uriKey) {
-        return this.findingsMap.get(uriKey) ?? [];
-    }
-    getAllFindings() {
-        return this.findingsMap;
-    }
-    clearAll() {
-        this.collection.clear();
-        this.findingsMap.clear();
-    }
-    clearDocument(uri) {
-        this.collection.delete(uri);
-        this.findingsMap.delete(uri.toString());
-    }
-    dispose() {
-        this.collection.dispose();
-    }
-    mapSeverity(s) {
-        if (s === 'error')
-            return vscode.DiagnosticSeverity.Error;
-        if (s === 'warning')
-            return vscode.DiagnosticSeverity.Warning;
-        return vscode.DiagnosticSeverity.Information;
-    }
-}
-exports.DiagnosticsProvider = DiagnosticsProvider;
+module.exports = __toCommonJS(diagnosticsProvider_exports);
+var vscode = __toESM(require("vscode"));
+var DiagnosticsProvider = class {
+  constructor() {
+    this.findingsMap = /* @__PURE__ */ new Map();
+    this.collection = vscode.languages.createDiagnosticCollection("regguard");
+  }
+  setFindings(document, findings) {
+    const key = document.uri.toString();
+    this.findingsMap.set(key, findings);
+    const diagnostics = findings.map((f) => {
+      const startLine = Math.min(f.line, document.lineCount - 1);
+      const endLine = Math.min(f.endLine, document.lineCount - 1);
+      const startLineText = document.lineAt(startLine).text;
+      const endLineText = document.lineAt(endLine).text;
+      const startChar = Math.min(f.startChar ?? 0, startLineText.length);
+      const endChar = Math.min(f.endChar ?? endLineText.length, endLineText.length);
+      const range = new vscode.Range(startLine, startChar, endLine, endChar);
+      const msg = `[RegGuard] ${f.message}` + (f.regulation.trending ? ` \u26A0 Trending: ${f.regulation.name}` : ` \u2014 ${f.regulation.name}`);
+      const d = new vscode.Diagnostic(range, msg, this.mapSeverity(f.severity));
+      d.source = "RegGuard";
+      d.code = { value: f.regulation.id, target: vscode.Uri.parse(f.regulation.source || "https://openrouter.ai") };
+      d.__regguardFinding = f;
+      return d;
+    });
+    this.collection.set(document.uri, diagnostics);
+  }
+  getFindings(uriKey) {
+    return this.findingsMap.get(uriKey) ?? [];
+  }
+  getAllFindings() {
+    return this.findingsMap;
+  }
+  clearAll() {
+    this.collection.clear();
+    this.findingsMap.clear();
+  }
+  clearDocument(uri) {
+    this.collection.delete(uri);
+    this.findingsMap.delete(uri.toString());
+  }
+  dispose() {
+    this.collection.dispose();
+  }
+  mapSeverity(s) {
+    if (s === "error") return vscode.DiagnosticSeverity.Error;
+    if (s === "warning") return vscode.DiagnosticSeverity.Warning;
+    return vscode.DiagnosticSeverity.Information;
+  }
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  DiagnosticsProvider
+});
 //# sourceMappingURL=diagnosticsProvider.js.map

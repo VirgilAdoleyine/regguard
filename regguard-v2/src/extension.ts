@@ -1,16 +1,16 @@
 import * as vscode from 'vscode';
-import { getConfig, validateConfig }    from './config';
-import { DiagnosticsProvider }          from './providers/diagnosticsProvider';
-import { CodeActionProvider }           from './providers/codeActionProvider';
-import { SidebarProvider }              from './providers/sidebarProvider';
+import { getConfig, validateConfig } from './config';
+import { DiagnosticsProvider } from './providers/diagnosticsProvider';
+import { CodeActionProvider } from './providers/codeActionProvider';
+import { SidebarProvider } from './providers/sidebarProvider';
 import { scanDocument, invalidateCache } from './scanner';
-import { CodeFinding }                  from './types';
+import { CodeFinding } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
 
   // ── Providers ────────────────────────────────────────────────────────────────
   const diagnostics = new DiagnosticsProvider();
-  const sidebar     = new SidebarProvider();
+  const sidebar = new SidebarProvider();
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(SidebarProvider.viewType, sidebar),
@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext): void {
       return;
     }
     const config = getConfig();
-    const err    = validateConfig(config);
+    const err = validateConfig(config);
     if (err) {
       const choice = await vscode.window.showErrorMessage(err, 'Open Settings');
       if (choice === 'Open Settings') {
@@ -102,7 +102,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand(
       'regguard.applyFixById',
       async (uriStr: string, findingId: string) => {
-        const uri     = vscode.Uri.parse(uriStr);
+        const uri = vscode.Uri.parse(uriStr);
         const finding = diagnostics.getFindings(uriStr).find(f => f.id === findingId);
         if (!finding) { return; }
         await applyFix(uri, finding, diagnostics);
@@ -158,7 +158,7 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 }
 
-export function deactivate(): void {/* nothing to clean up */}
+export function deactivate(): void {/* nothing to clean up */ }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -172,15 +172,20 @@ async function applyFix(
     return;
   }
 
-  const doc    = await vscode.workspace.openTextDocument(uri);
+  const doc = await vscode.workspace.openTextDocument(uri);
   const editor = await vscode.window.showTextDocument(doc);
 
-  const startLine = Math.min(finding.line,    doc.lineCount - 1);
-  const endLine   = Math.min(finding.endLine, doc.lineCount - 1);
+  if (doc.lineCount === 0 || finding.line < 0) {
+    vscode.window.showErrorMessage('RegGuard: Cannot apply fix to an empty document.');
+    return;
+  }
+
+  const startLine = Math.max(0, Math.min(finding.line, doc.lineCount - 1));
+  const endLine = Math.max(0, Math.min(finding.endLine ?? finding.line, doc.lineCount - 1));
 
   const range = new vscode.Range(
     startLine, 0,
-    endLine,   doc.lineAt(endLine).text.length
+    endLine, doc.lineAt(endLine).range.end.character
   );
 
   const choice = await vscode.window.showInformationMessage(
@@ -192,7 +197,7 @@ async function applyFix(
 
   if (choice !== 'Apply Fix') { return; }
 
-  const ok = await editor.edit(b => b.replace(range, finding.proposedFix!));
+  const ok = await editor.edit(editBuilder => editBuilder.replace(range, finding.proposedFix!));
   if (ok) {
     // Remove the resolved finding
     const remaining = diagnostics.getFindings(uri.toString()).filter(f => f.id !== finding.id);
@@ -230,5 +235,5 @@ ${trend}${fix}${src}
 }
 
 function esc(s: string): string {
-  return (s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }

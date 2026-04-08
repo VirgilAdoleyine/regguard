@@ -1,60 +1,64 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/config.ts
+var config_exports = {};
+__export(config_exports, {
+  getConfig: () => getConfig,
+  validateConfig: () => validateConfig
 });
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getConfig = getConfig;
-exports.validateConfig = validateConfig;
-const vscode = __importStar(require("vscode"));
+module.exports = __toCommonJS(config_exports);
+var vscode = __toESM(require("vscode"));
 function getConfig() {
-    const cfg = vscode.workspace.getConfiguration('regguard');
-    return {
-        openRouterKey: cfg.get('openRouterKey', ''),
-        productType: cfg.get('productType', ''),
-        releaseRegions: cfg.get('releaseRegions', []),
-        clientRegions: cfg.get('clientRegions', []),
-        externalTools: cfg.get('externalTools', []),
-        internalTools: cfg.get('internalTools', []),
-        scanOnSave: cfg.get('scanOnSave', false),
-    };
+  const cfg = vscode.workspace.getConfiguration("regguard");
+  return {
+    openRouterKey: cfg.get("openRouterKey", ""),
+    productType: cfg.get("productType", ""),
+    releaseRegions: cfg.get("releaseRegions", []),
+    clientRegions: cfg.get("clientRegions", []),
+    externalTools: cfg.get("externalTools", []),
+    internalTools: cfg.get("internalTools", []),
+    scanOnSave: cfg.get("scanOnSave", false)
+  };
 }
 function validateConfig(config) {
-    if (!config.openRouterKey.trim()) {
-        return 'RegGuard: OpenRouter API key is missing. Add it in Settings → RegGuard.';
-    }
-    if (!config.productType.trim()) {
-        return 'RegGuard: Product type is missing. Describe your product in Settings → RegGuard.';
-    }
-    return null;
+  if (!config.openRouterKey.trim()) {
+    return "RegGuard: OpenRouter API key is missing. Add it in Settings \u2192 RegGuard.";
+  }
+  if (!config.productType.trim()) {
+    return "RegGuard: Product type is missing. Describe your product in Settings \u2192 RegGuard.";
+  }
+  return null;
 }
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  getConfig,
+  validateConfig
+});
 //# sourceMappingURL=config.js.map

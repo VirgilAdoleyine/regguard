@@ -88,12 +88,77 @@ Your code is sent to Claude via OpenRouter. Regulations context is sent to Perpl
 
 ---
 
-## Development
+## VibeFlow — AI Workflow Builder
+
+Build automation workflows from plain English. Claude + Gemini write, run, and self-heal Python scripts for you.
+
+**By Virgil Junior Adoleyine — 17, 🇬🇭 Ghana**
+
+### Features
+
+- **Natural Language First** — Type what you want, AI builds it
+- **Visual Canvas** — React Flow node editor for power users
+- **In-Canvas Execution** — Run and test workflows directly without leaving the builder
+- **Live Node Editing** — Click and customize any node's logic or integration on the fly
+- **Composio Native Setup** — Link 400+ apps directly via the extension
+- **4-Node AI Agent** — Planner → Executor → Reflector (self-healer) → Formatter
+- **Infinite Self-Healing** — Code retries until fixed, or until you stop it
+- **Best Model Search** — Perplexity finds the right model for your task
+- **Global Compliance** — Regulations checked via Perplexity + Grok
+- **Claude Compliance Fixes** — Auto-patches code to meet regulations
+- **Generate .py + .env + README** — Full runnable Python workflow files
+- **Dual-Remote Git Sync** — Push to cloud + community repos in one command
+
+### Get Started
+
+1. Install the extension
+2. Open Settings → search VibeFlow → add your OpenRouter API key
+3. Press Ctrl+Shift+P → VibeFlow: Open Workflow Builder
+4. Describe your workflow and watch AI build it
+
+### Want More?
+
+Visit [vibeflow-cloud.vercel.app](https://vibeflow-cloud.vercel.app) for:
+
+- Full visual UI with execution history
+- 400+ OAuth integrations (Gmail, Slack, GitHub, Notion...)
+- Memory of past workflows
+- No-code friendly interface for non-developers
+
+---
+
+## Support RegGuard
+
+This extension is supported by RegGuard — a compliance and regulatory tool for developers to ship faster.
+
+- **GitHub:** [github.com/VirgilAdoleyine/regguard](https://github.com/VirgilAdoleyine/regguard)
+- **Marketplace:** Search "RegGuard" on VS Code Marketplace or Open VSX
+
+⭐ **Please star RegGuard to help us grow and support developers worldwide.**
+
+---
+
+## Join the Community
+
+VibeFlow is an open-source mission to empower developers worldwide. By contributing, you help fellow engineers deploy automation faster than ever while ensuring every regulation is met through our AI-driven compliance engine.
+
+### Empower Developers Worldwide
+
+We need your expertise to build the future of compliant automation. Your contributions directly support developers across the globe in shipping safer, faster, and more robust code.
+
+### Fork & Setup
 
 ```bash
-git clone <repo>
-cd regguard
+git clone https://github.com/VirgilAdoleyine/regguard
+cd regguard/regguard-v2
 npm install
-npm run compile
-# Press F5 in VS Code to launch extension in debug mode
+npm run bundle
 ```
+
+### Contribute
+
+Help us expand regulation coverage, enhance detection accuracy, or add new LLM providers. Submit a PR and help developers everywhere meet global standards with ease.
+
+---
+
+MIT License · Made with ❤️ in Ghana 🇬🇭

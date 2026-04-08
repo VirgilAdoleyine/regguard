@@ -1,1 +1,7 @@
-{"version":3,"file":"types.js","sourceRoot":"","sources":["../src/types.ts"],"names":[],"mappings":""}
+{
+  "version": 3,
+  "sources": ["../src/types.ts"],
+  "sourcesContent": ["export interface RegGuardConfig {\r\n  openRouterKey: string;\r\n  productType: string;\r\n  releaseRegions: string[];\r\n  clientRegions: string[];\r\n  externalTools: string[];\r\n  internalTools: string[];\r\n  scanOnSave: boolean;\r\n}\r\n\r\nexport interface Regulation {\r\n  id: string;\r\n  name: string;\r\n  description: string;\r\n  region: string;\r\n  source?: string;\r\n  trending?: boolean;\r\n  trendReason?: string;\r\n}\r\n\r\nexport interface CodeFinding {\r\n  id: string;\r\n  line: number;       // 0-indexed inside extension; Claude returns 1-indexed and we convert\r\n  endLine: number;    // 0-indexed\r\n  startChar: number;\r\n  endChar: number;\r\n  severity: 'error' | 'warning' | 'info';\r\n  message: string;\r\n  regulation: Regulation;\r\n  proposedFix?: string;\r\n  fixDescription?: string;\r\n  originalCode?: string;\r\n}\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;AAAA;AAAA;",
+  "names": []
+}
