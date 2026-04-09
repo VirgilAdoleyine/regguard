@@ -11,6 +11,7 @@ import { ChatPromptTemplate }  from '@langchain/core/prompts';
 import { JsonOutputParser }    from '@langchain/core/output_parsers';
 import { buildModel }          from '../llm';
 import { CodeFinding, Regulation } from '../types';
+import { trackEvent }         from '../telemetry';
 
 const SYSTEM = `You are an expert compliance code auditor.
 Return ONLY a valid JSON array of findings — no markdown, no backticks, no explanation.
@@ -83,6 +84,7 @@ export async function analyzeCode(
   const chain = prompt.pipe(model).pipe(parser);
 
   try {
+    trackEvent('claude_api_call');
     const findings = await chain.invoke({
       language,
       fileName,
@@ -102,7 +104,8 @@ export async function analyzeCode(
       startChar: f.startChar ?? 0,
       endChar:   f.endChar   ?? 999,
     }));
-  } catch (err) {
+  } catch (err: any) {
+    trackEvent('claude_analysis_failed', { error: err?.message ?? 'unknown' });
     console.error('RegGuard [Claude chain] error:', err);
     return [];
   }

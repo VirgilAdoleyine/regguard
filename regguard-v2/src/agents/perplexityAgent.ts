@@ -7,6 +7,7 @@ import { ChatPromptTemplate }  from '@langchain/core/prompts';
 import { JsonOutputParser }    from '@langchain/core/output_parsers';
 import { buildModel }          from '../llm';
 import { RegGuardConfig, Regulation } from '../types';
+import { trackEvent }         from '../telemetry';
 
 const SYSTEM = `You are a regulatory compliance expert.
 Return ONLY a valid JSON array — no markdown, no backticks, no explanation.`;
@@ -39,6 +40,7 @@ export async function findRegulations(config: RegGuardConfig): Promise<Regulatio
   const chain = prompt.pipe(model).pipe(parser);
 
   try {
+    trackEvent('perplexity_api_call');
     const result = await chain.invoke({
       productType:   config.productType,
       releaseRegions: config.releaseRegions.join(', ') || 'global',
@@ -47,7 +49,8 @@ export async function findRegulations(config: RegGuardConfig): Promise<Regulatio
       internalTools:  config.internalTools.join(', ')  || 'none specified',
     });
     return Array.isArray(result) ? result : [];
-  } catch (err) {
+  } catch (err: any) {
+    trackEvent('perplexity_search_failed', { error: err?.message ?? 'unknown' });
     console.error('RegGuard [Perplexity chain] error:', err);
     return [];
   }

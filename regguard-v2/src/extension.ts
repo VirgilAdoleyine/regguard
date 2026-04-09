@@ -5,8 +5,10 @@ import { CodeActionProvider } from './providers/codeActionProvider';
 import { SidebarProvider } from './providers/sidebarProvider';
 import { scanDocument, invalidateCache } from './scanner';
 import { CodeFinding } from './types';
+import { trackEvent, shutdownTelemetry } from './telemetry';
 
 export function activate(context: vscode.ExtensionContext): void {
+  trackEvent('extension_activated');
 
   // ── Rating Prompt (after 3 hours) ─────────────────────────────────────────────
   const RATING_DELAY_MS = 3 * 60 * 60 * 1000; // 3 hours
@@ -199,7 +201,9 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 }
 
-export function deactivate(): void {/* nothing to clean up */ }
+export async function deactivate(): Promise<void> {
+  await shutdownTelemetry();
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -236,7 +240,12 @@ async function applyFix(
     'Cancel'
   );
 
-  if (choice !== 'Apply Fix') { return; }
+  if (choice !== 'Apply Fix') {
+    trackEvent('claude_fix_declined', { fixIndex: 0 });
+    return;
+  }
+
+  trackEvent('claude_fix_accepted');
 
   const ok = await editor.edit(editBuilder => editBuilder.replace(range, finding.proposedFix!));
   if (ok) {

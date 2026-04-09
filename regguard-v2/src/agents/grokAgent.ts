@@ -7,6 +7,7 @@ import { ChatPromptTemplate }  from '@langchain/core/prompts';
 import { JsonOutputParser }    from '@langchain/core/output_parsers';
 import { buildModel }          from '../llm';
 import { RegGuardConfig, Regulation } from '../types';
+import { trackEvent }         from '../telemetry';
 
 const SYSTEM = `You are a regulatory trend analyst with deep knowledge of emerging laws and compliance deadlines.
 Return ONLY a valid JSON array — no markdown, no backticks, no explanation.`;
@@ -46,10 +47,12 @@ export async function findTrendingRegulations(config: RegGuardConfig): Promise<R
     .join(', ') || 'general software stack';
 
   try {
+    trackEvent('grok_api_call');
     const result = await chain.invoke({ productType: config.productType, regions, tools });
     const regs   = Array.isArray(result) ? result : [];
     return regs.map(r => ({ ...r, trending: true }));
-  } catch (err) {
+  } catch (err: any) {
+    trackEvent('grok_search_failed', { error: err?.message ?? 'unknown' });
     console.error('RegGuard [Grok chain] error:', err);
     return [];
   }

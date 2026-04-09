@@ -2,7 +2,7 @@
   "name": "regguard",
   "displayName": "RegGuard",
   "description": "AI compliance co-pilot — flags regulatory issues in your code and proposes fixes using Perplexity, Grok, and Claude via OpenRouter.",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "publisher": "regguard",
   "engines": {
     "vscode": "^1.85.0"
@@ -143,7 +143,8 @@
   "dependencies": {
     "@langchain/core": "^0.3.58",
     "@langchain/openai": "0.3.17",
-    "langchain": "0.3.37"
+    "langchain": "0.3.37",
+    "posthog-node": "^5.29.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
