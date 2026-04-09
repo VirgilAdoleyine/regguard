@@ -35,6 +35,7 @@ async function build() {
     outdir: outDir,
     format: 'cjs',
     sourcemap: true,
+    minify: true,
     external: ['vscode'],
     loader: {
       '.ts': 'ts'

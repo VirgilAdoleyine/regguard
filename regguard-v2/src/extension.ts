@@ -7,6 +7,20 @@ import { scanDocument, invalidateCache } from './scanner';
 import { CodeFinding } from './types';
 import { trackEvent, shutdownTelemetry } from './telemetry';
 
+// ── Debounce & Hash Maps ─────────────────────────────────────────────────────────
+const saveTimers = new Map<string, NodeJS.Timeout>();
+const fileHashes = new Map<string, string>();
+
+function getFileHash(content: string): string {
+  let hash = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash.toString(16);
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   trackEvent('extension_activated');
 
@@ -67,6 +81,20 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // ── Helper: run a scan after validating config ────────────────────────────────
   async function runScan(doc?: vscode.TextDocument): Promise<void> {
+    // AI consent check (one-time)
+    const aiConsent = context.globalState.get<boolean>('regguard.aiConsent');
+    if (aiConsent === undefined) {
+      const choice = await vscode.window.showWarningMessage(
+        'RegGuard will send the selected code to Claude via OpenRouter for compliance analysis. Continue?',
+        'Continue',
+        'Cancel'
+      );
+      if (choice !== 'Continue') {
+        return;
+      }
+      await context.globalState.update('regguard.aiConsent', true);
+    }
+
     const target = doc ?? vscode.window.activeTextEditor?.document;
     if (!target) {
       vscode.window.showWarningMessage('RegGuard: Open a file first.');
@@ -187,7 +215,29 @@ export function activate(context: vscode.ExtensionContext): void {
       const cfg = getConfig();
       if (!cfg.scanOnSave) { return; }
       if (validateConfig(cfg)) { return; }
-      runScan(doc);
+
+      const docUri = doc.uri.toString();
+      const content = doc.getText();
+      const newHash = getFileHash(content);
+
+      // Skip if content unchanged
+      if (fileHashes.get(docUri) === newHash) {
+        return;
+      }
+      fileHashes.set(docUri, newHash);
+
+      // Clear existing timer
+      const existingTimer = saveTimers.get(docUri);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      // Set new 800ms debounce timer
+      const timer = setTimeout(() => {
+        saveTimers.delete(docUri);
+        runScan(doc);
+      }, 800);
+      saveTimers.set(docUri, timer);
     })
   );
 
